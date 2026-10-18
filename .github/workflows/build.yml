@@ -24,18 +24,25 @@ jobs:
           flutter-version: '3.19.x'
           cache: true
 
-      # নতুন গ্রেডল প্রবলেম এড়াতে ফ্লাটার প্রজেক্ট প্রি-ফিক্স বা গ্রেডল আপডেট করার কমান্ড
-      - name: Clean and Upgrade Project
+      - name: Create Fresh Flutter Project & Replace Files
         run: |
-          flutter clean
+          # বর্তমান রুট ফোল্ডারে একটি নতুন ফ্লাটার প্রজেক্ট তৈরি করুন (সাময়িক নাম temp_app)
+          flutter create -t app temp_app --org com.example.barcouncil
+          
+          # আপনার কাস্টম main.dart এবং pubspec.yaml ফাইল নতুন প্রজেক্টে কপি করুন
+          cp lib/main.dart temp_app/lib/main.dart
+          cp pubspec.yaml temp_app/pubspec.yaml
+          
+          # কাজের সুবিধার্থে temp_app ফোল্ডারে প্রবেশ করুন
+          cd temp_app
+          
+          # ডিপেন্ডেন্সি গেট করুন এবং রিলিজ এপিকে বিল্ড করুন
           flutter pub get
-
-      - name: Build APK
-        run: flutter build apk --release
+          flutter build apk --release
 
       - name: Upload APK Artifact
         uses: actions/upload-artifact@v4
         with:
           name: release-apk
-          path: build/app/outputs/flutter-apk/app-release.apk
+          path: temp_app/build/app/outputs/flutter-apk/app-release.apk
           
